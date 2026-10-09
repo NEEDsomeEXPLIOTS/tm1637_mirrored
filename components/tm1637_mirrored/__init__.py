@@ -1,1 +1,2 @@
+DOMAIN = "tm1637_mirrored"
 IS_PLATFORM_COMPONENT = True
