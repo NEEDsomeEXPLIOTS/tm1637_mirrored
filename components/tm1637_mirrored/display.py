@@ -1,23 +1,23 @@
-import esphome.codegen as cg
-import esphome.config_validation as cv
 from esphome import pins
+import esphome.codegen as cg
 from esphome.components import tm1637
+import esphome.config_validation as cv
 from esphome.const import CONF_ID
 
 DEPENDENCIES = ['esp32', 'esp8266']
 AUTO_LOAD = ['tm1637']
 
-tm1637_mirrored_ns = cg.esphome_ns.namespace('tm1637_mirrored')
-TM1637MirroredDisplay = tm1637_mirrored_ns.class_('TM1637MirroredDisplay', tm1637.TM1637Display)
+tm1637_mirrored_ns = cg.esphome_ns.namespace("tm1637_mirrored")
+TM1637MirroredDisplay = tm1637_mirrored_ns.class_("TM1637MirroredDisplay", tm1637.TM1637Display)
 
-CONF_CLK_PIN = 'clk_pin'
-CONF_DIO_PIN = 'dio_pin'
-CONF_MIRROR_SEGMENTS = 'mirror_segments'
-CONF_REVERSE_DIGITS = 'reverse_digits'
-CONF_LENGTH = 'length'
-CONF_INTENSITY = 'intensity'
-CONF_UPDATE_INTERVAL = 'update_interval'
-CONF_INVERTED = 'inverted'
+CONF_CLK_PIN = "clk_pin"
+CONF_DIO_PIN = "dio_pin"
+CONF_MIRROR_SEGMENTS = "mirror_segments"
+CONF_REVERSE_DIGITS = "reverse_digits"
+CONF_LENGTH = "length"
+CONF_INTENSITY = "intensity"
+CONF_UPDATE_INTERVAL = "update_interval"
+CONF_INVERTED = "inverted"
 
 # Build config schema extending TM1637 base
 CONFIG_SCHEMA = cv.All(
