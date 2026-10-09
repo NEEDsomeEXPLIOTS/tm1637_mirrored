@@ -4,40 +4,45 @@
 namespace esphome {
 namespace tm1637_mirrored {
 
-static const char *const TAG = "tm1637_mirrored.display";
+static const char *const TAG = "tm1637_mirrored";
 
-// Standard 7-segment patterns for digits 0-9
-// Bit layout: gfe_dcba (common cathode)
-static const uint8_t SEGMENT_MAP[10] = {
-  0x3F,  // 0: a+b+c+d+e+f
-  0x06,  // 1: b+c
-  0x5B,  // 2: a+b+d+e+g
-  0x4F,  // 3: a+b+c+d+g
-  0x66,  // 4: b+c+f+g
-  0x6D,  // 5: a+c+d+f+g
-  0x7D,  // 6: a+c+d+e+f+g
-  0x07,  // 7: a+b+c
-  0x7F,  // 8: all segments
-  0x6F   // 9: a+b+c+d+f+g
+// Standard 7-segment patterns (common cathode)
+// Bit layout: dp gfedcba
+// a=1, b=2, c=4, d=8, e=16, f=32, g=64, dp=128
+const uint8_t TM1637MirroredDisplay::SEGMENT_MAP[10] = {
+  0x3F,  // 0: abcdef
+  0x06,  // 1: bc
+  0x5B,  // 2: abdeg
+  0x4F,  // 3: abcdg
+  0x66,  // 4: bcfg
+  0x6D,  // 5: acdfg
+  0x7D,  // 6: acdefg
+  0x07,  // 7: abc
+  0x7F,  // 8: abcdefg
+  0x6F   // 9: abcdfg
 };
 
-// Mirrored patterns (upside-down for floor projection)
-// Some digits remain unchanged (0,1,8), others transform
-static const uint8_t MIRRORED_SEGMENT_MAP[10] = {
-  0x3F,  // 0 -> 0 (symmetric)
-  0x06,  // 1 -> 1
-  0x5B,  // 2 -> 2 (may need adjustment based on your module)
-  0x4F,  // 3 -> 3
-  0x66,  // 4 -> 4
-  0x6D,  // 5 -> 5
-  0x7D,  // 6 -> 6
-  0x07,  // 7 -> 7
-  0x7F,  // 8 -> 8 (symmetric)
-  0x6F   // 9 -> 9
+// Mirrored patterns for floor projection (upside-down reflection)
+// Some digits remain unchanged (0,1,8), others may need manual adjustment
+const uint8_t TM1637MirroredDisplay::MIRRORED_SEGMENT_MAP[10] = {
+  0x3F,  // 0 -> symmetric
+  0x06,  // 1 -> symmetric
+  0x5B,  // 2 -> may need testing
+  0x4F,  // 3 -> may need testing
+  0x66,  // 4 -> may need testing
+  0x6D,  // 5 -> may need testing
+  0x7D,  // 6 -> may need testing
+  0x07,  // 7 -> may need testing
+  0x7F,  // 8 -> symmetric
+  0x6F   // 9 -> may need testing
 };
 
 void TM1637MirroredDisplay::setup() {
   ESP_LOGCONFIG(TAG, "Setting up TM1637 Mirrored Display...");
+  ESP_LOGCONFIG(TAG, "  Mirror Segments: %s", YESNO(this->mirror_enabled_));
+  ESP_LOGCONFIG(TAG, "  Reverse Digits: %s", YESNO(this->reverse_digits_));
+  
+  // Call parent setup for TM1637 initialization
   tm1637::TM1637Display::setup();
 }
 
@@ -50,34 +55,35 @@ uint8_t TM1637MirroredDisplay::digit_to_mirrored_segment(uint8_t digit) {
   return SEGMENT_MAP[digit];
 }
 
-void TM1637MirroredDisplay::render(const char *text) {
-  int len = strlen(text);
-  int num_digits = std::min(len, 4);
+void TM1637MirroredDisplay::write_buffer(const uint8_t *data, uint8_t length) {
+  uint8_t transformed_buf[6];  // Max 6 digits
+  uint8_t actual_length = std::min(length, (uint8_t)6);
   
-  uint8_t buffer[4] = {0x00, 0x00, 0x00, 0x00};
-  
-  for (int i = 0; i < num_digits; i++) {
-    char c = text[i];
-    uint8_t digit = 0xFF;
-    
-    if (c >= '0' && c <= '9') {
-      digit = c - '0';
-    } else if (c == ' ') {
-      digit = 0xFF;  // Blank
+  if (reverse_digits_) {
+    // Reverse digit order for floor viewing
+    for (uint8_t i = 0; i < actual_length; i++) {
+      uint8_t original_digit = data[i] & 0x0F;  // Extract digit (lower 4 bits)
+      uint8_t segment_pattern = digit_to_mirrored_segment(original_digit);
+      // Preserve decimal point flag if present
+      if (data[i] & 0x80) {
+        segment_pattern |= 0x80;
+      }
+      transformed_buf[actual_length - 1 - i] = segment_pattern;
     }
-    
-    uint8_t segment_pattern = digit_to_mirrored_segment(digit);
-    
-    if (reverse_digits_) {
-      // Reverse order: rightmost digit goes to leftmost position
-      buffer[num_digits - 1 - i] = segment_pattern;
-    } else {
-      buffer[i] = segment_pattern;
+  } else {
+    // Keep order, just apply segment mirroring
+    for (uint8_t i = 0; i < actual_length; i++) {
+      uint8_t original_digit = data[i] & 0x0F;
+      uint8_t segment_pattern = digit_to_mirrored_segment(original_digit);
+      if (data[i] & 0x80) {
+        segment_pattern |= 0x80;
+      }
+      transformed_buf[i] = segment_pattern;
     }
   }
   
-  // Apply display buffer
-  this->set_buffer(buffer, num_digits);
+  // Write transformed buffer to display
+  this->set_buffer(transformed_buf, actual_length);
 }
 
 }  // namespace tm1637_mirrored
