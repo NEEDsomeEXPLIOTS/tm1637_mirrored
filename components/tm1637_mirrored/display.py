@@ -7,8 +7,8 @@ from esphome.const import CONF_ID
 DEPENDENCIES = ['esp32', 'esp8266']
 AUTO_LOAD = ['tm1637']
 
-tm1637_mirrored_ns = cg.esphome_ns.namespace("tm1637_mirrored")
-TM1637MirroredDisplay = tm1637_mirrored_ns.class_("TM1637MirroredDisplay", tm1637.TM1637MirroredDisplay)
+tm1637_mirrored_ns = cg.esphome_ns.namespace('tm1637_mirrored')
+TM1637MirroredDisplay = tm1637_mirrored_ns.class_('TM1637MirroredDisplay', tm1637.TM1637Display)
 
 CONF_CLK_PIN = "clk_pin"
 CONF_DIO_PIN = "dio_pin"

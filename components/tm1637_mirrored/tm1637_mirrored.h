@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/tm1637/tm1637.h"
+#include "esphome/components/tm1637/tm1637_display.h"
 #include "esphome/components/display/text_display.h"
 
 namespace esphome {
