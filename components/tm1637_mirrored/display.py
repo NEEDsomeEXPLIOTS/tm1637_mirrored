@@ -9,8 +9,8 @@ DEPENDENCIES = ['esp32', 'esp8266']
 AUTO_LOAD = ['tm1637']
 
 tm1637_mirrored_ns = cg.esphome_ns.namespace('tm1637_mirrored')
-TM1637MirroredDisplay = tm1637_mirrored_ns.class_('TM1637MirroredDisplay', tm1637.TM1637Display)
-TM1637MirroredDisplayRef = TM1637MirroredDisplay.operator("ref")
+TM1637Display = tm1637_mirrored_ns.class_("TM1637Display", cg.PollingComponent)
+TM1637DisplayRef = TM1637Display.operator("ref")
 
 CONF_CLK_PIN = "clk_pin"
 CONF_DIO_PIN = "dio_pin"
