@@ -4,6 +4,11 @@
 #include "esphome/components/tm1637/tm1637.h"
 #include "esphome/components/tm1637/tm1637_display.h"
 #include "esphome/components/display/text_display.h"
+#include "esphome/components/display/display.h"
+#include "esphome/core/time.h"
+#include "esphome/core/hal.h"
+#include "esphome/core/defines.h"
+
 
 namespace esphome {
 namespace tm1637_mirrored {

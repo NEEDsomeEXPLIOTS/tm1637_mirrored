@@ -1,8 +1,9 @@
 #include "esphome/core/log.h"
+#include "esphome/core/helpers.h"
 #include "tm1637_mirrored.h"
+#include "tm1637.h"
 
-namespace esphome {
-namespace tm1637_mirrored {
+namespace esphome::tm1637_mirrored {
 
 static const char *const TAG = "tm1637_mirrored";
 
@@ -87,4 +88,3 @@ void TM1637MirroredDisplay::write_buffer(const uint8_t *data, uint8_t length) {
 }
 
 }  // namespace tm1637_mirrored
-}  // namespace esphome
